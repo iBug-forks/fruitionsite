@@ -25,7 +25,7 @@ export default function code(data) {
 
   /* Step 1: enter your domain name like fruitionsite.com */
   const MY_DOMAIN = '${url}';
-  
+
   /*
    * Step 2: enter your URL slug to page ID mapping
    * The key on the left is the slug (without the slash)
@@ -40,19 +40,19 @@ ${slugs
         return `    '${pageUrl}': '${id}',\n`;
     })
     .join('')}  };
-  
+
   /* Step 3: enter your page title and description for SEO purposes */
   const PAGE_TITLE = '${pageTitle || ''}';
   const PAGE_DESCRIPTION = '${pageDescription || ''}';
-  
+
   /* Step 4: enter a Google Font name, you can choose from https://fonts.google.com */
   const GOOGLE_FONT = '${googleFont || ''}';
-  
+
   /* Step 5: enter any custom scripts you'd like */
   const CUSTOM_SCRIPT = \`${customScript || ''}\`;
-  
+
   /* CONFIGURATION ENDS HERE */
-  
+
   const PAGE_TO_SLUG = {};
   const slugs = [];
   const pages = [];
@@ -62,7 +62,7 @@ ${slugs
     pages.push(page);
     PAGE_TO_SLUG[page] = slug;
   });
-  
+
   addEventListener('fetch', event => {
     event.respondWith(fetchAndApply(event.request));
   });
@@ -77,13 +77,13 @@ ${slugs
     sitemap += '</urlset>';
     return sitemap;
   }
-  
+
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, HEAD, POST, PUT, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   };
-  
+
   function handleOptions(request) {
     if (request.headers.get('Origin') !== null &&
       request.headers.get('Access-Control-Request-Method') !== null &&
@@ -101,7 +101,7 @@ ${slugs
       });
     }
   }
-  
+
   async function fetchAndApply(request) {
     if (request.method === 'OPTIONS') {
       return handleOptions(request);
@@ -147,10 +147,10 @@ ${slugs
       response.headers.delete('Content-Security-Policy');
       response.headers.delete('X-Content-Security-Policy');
     }
-  
+
     return appendJavascript(response, SLUG_TO_PAGE);
   }
-  
+
   class MetaRewriter {
     element(element) {
       if (PAGE_TITLE !== '') {
@@ -178,7 +178,7 @@ ${slugs
       }
     }
   }
-  
+
   class HeadRewriter {
     element(element) {
       if (GOOGLE_FONT !== '') {
@@ -188,18 +188,16 @@ ${slugs
         });
       }
       element.append(\`<style>
-      div.notion-topbar > div > div:nth-child(3) { display: none !important; }
-      div.notion-topbar > div > div:nth-child(4) { display: none !important; }
-      div.notion-topbar > div > div:nth-child(5) { display: none !important; }
-      div.notion-topbar > div > div:nth-child(6) { display: none !important; }
-      div.notion-topbar-mobile > div:nth-child(3) { display: none !important; }
-      div.notion-topbar-mobile > div:nth-child(4) { display: none !important; }
+      div.notion-topbar > div > div:nth-last-child(1) { display: none !important; }
+      div.notion-topbar > div > div:nth-last-child(2) { display: none !important; }
+      div.notion-topbar-mobile > div:nth-last-child(1) { display: none !important; }
+      div.notion-topbar-mobile > div:nth-last-child(2) { display: none !important; }
       </style>\`, {
         html: true
       })
     }
   }
-  
+
   class BodyRewriter {
     constructor(SLUG_TO_PAGE) {
       this.SLUG_TO_PAGE = SLUG_TO_PAGE;
@@ -279,7 +277,7 @@ ${slugs
       });
     }
   }
-  
+
   async function appendJavascript(res, SLUG_TO_PAGE) {
     return new HTMLRewriter()
       .on('title', new MetaRewriter())
